@@ -193,6 +193,10 @@ function loadVector(file, name, format) {
   reader.readAsText(file);
 }
 
+defaultRoutes.forEach(item => {
+  createVectorLayer(item.routeName, item.routeData, null, false);  
+})
+
 function createVectorLayer(name, data, key, save) {
   let radius = 4;
   var key = key ? key : Date.now().toString();
