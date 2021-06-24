@@ -29,7 +29,8 @@ workbox.precaching.precacheAndRoute([
   {url: 'assets/vendor/leaflet-locatecontrol-0.72.1/L.Control.Locate.min.js', revision: '09.09.20.1'},
   {url: 'assets/vendor/leaflet-mbtiles/Leaflet.TileLayer.MBTiles.js', revision: '09.09.20.1'},
   {url: 'assets/vendor/csv2geojson-5.1.1/csv2geojson.min.js', revision: '03.05.21.1'},
-  {url: 'assets/vendor/togeojson-0.16.0/togeojson.min.js', revision: '03.05.21.1'}
+  {url: 'assets/vendor/togeojson-0.16.0/togeojson.min.js', revision: '03.05.21.1'},
+  {url: 'assets/vendor/leaflet-elevation-1.6.8/leaflet-elevation.js', revision: '03.05.21.1'}
 ], {
   // Ignore all URL parameters.
   ignoreURLParametersMatching: [/.*/]

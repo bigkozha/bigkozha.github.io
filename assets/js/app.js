@@ -1,3 +1,73 @@
+var elevation_options = {
+
+  // Default chart colors: theme lime-theme, magenta-theme, ...
+  theme: "lightblue-theme",
+
+  // Chart container outside/inside map container
+  detached: true,
+
+  // if (detached), the elevation chart container
+  elevationDiv: "#elevation-div",
+
+  // if (!detached) autohide chart profile on chart mouseleave
+  autohide: false,
+
+  // if (!detached) initial state of chart profile control
+  collapsed: false,
+
+  // if (!detached) control position on one of map corners
+  position: "topright",
+
+  // Autoupdate map center on chart mouseover.
+  followMarker: true,
+
+  // Autoupdate map bounds on chart update.
+  autofitBounds: true,
+
+  // Chart distance/elevation units.
+  imperial: false,
+
+  // [Lat, Long] vs [Long, Lat] points. (leaflet default: [Lat, Long])
+  reverseCoords: false,
+
+  // Acceleration chart profile: true || "summary" || "disabled" || false
+  acceleration: false,
+
+  // Slope chart profile: true || "summary" || "disabled" || false
+  slope: false,
+
+  // Speed chart profile: true || "summary" || "disabled" || false
+  speed: false,
+
+  // Display time info: true || "summary" || false
+  time: false,
+
+  // Display distance info: true || "summary"
+  distance: true,
+
+  // Display altitude info: true || "summary"
+  altitude: true,
+
+  // Summary track info style: "line" || "multiline" || false
+  summary: 'multiline',
+
+  // Toggle chart ruler filter.
+  ruler: true,
+
+  // Toggle chart legend filter.
+  legend: true,
+
+  // Toggle "leaflet-almostover" integration
+  almostOver: true,
+
+  // Toggle "leaflet-distance-markers" integration
+  distanceMarkers: false,
+
+  // Render chart profiles as Canvas or SVG Paths
+  preferCanvas: true
+
+};
+
 const mapStore = localforage.createInstance({
   name: "maps",
   storeName: "saved_maps"
@@ -20,16 +90,16 @@ const map = L.map("map", {
 }).fitWorld();
 map.attributionControl.setPrefix(`<span id="status" style="color:${navigator.onLine ? "green" : "red"}">&#9673;</span> <a href="#" onclick="showInfo(); return false;">About</a>`);
 
-map.once("locationfound", function(e) {
+map.once("locationfound", function (e) {
   hideLoader();
-  map.fitBounds(e.bounds, {maxZoom: 18});
+  map.fitBounds(e.bounds, { maxZoom: 18 });
 });
 
-map.on("click", function(e) {
+map.on("click", function (e) {
   layers.select.clearLayers();
 });
 
-map.on("baselayerchange", function(e) {
+map.on("baselayerchange", function (e) {
   localStorage.setItem("basemap", e.name);
 });
 
@@ -46,7 +116,7 @@ const layers = {
     //   maxZoom: map.getMaxZoom(),
     //   attribution: "USGS",
     // }),
-    
+
     // "Topo": L.tileLayer("https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}", {
     //   maxNativeZoom: 16,
     //   maxZoom: map.getMaxZoom(),
@@ -65,20 +135,20 @@ const layers = {
 
 /*** Begin custom input control for adding local file ***/
 L.Control.AddFile = L.Control.extend({
-  onAdd: function(map) {
+  onAdd: function (map) {
     const ua = window.navigator.userAgent;
     const iOS = !!ua.match(/iP(ad|od|hone)/i);
     fileInput = L.DomUtil.create("input", "hidden");
     fileInput.type = "file";
     fileInput.accept = iOS ? "*" : ".mbtiles, .geojson, .kml, .gpx, .csv";
     fileInput.style.display = "none";
-    
+
     fileInput.addEventListener("change", function () {
       const file = fileInput.files[0];
       handleFile(file);
       this.value = "";
     }, false);
-    
+
     const div = L.DomUtil.create("div", "leaflet-bar leaflet-control");
     div.innerHTML = `
       <a class='leaflet-bar-part leaflet-bar-part-single file-control-btn' title='Загрузить файл' onclick='fileInput.click();'>
@@ -92,7 +162,7 @@ L.Control.AddFile = L.Control.extend({
   }
 });
 
-L.control.addfile = function(opts) {
+L.control.addfile = function (opts) {
   return new L.Control.AddFile(opts);
 }
 /*** End custom control ***/
@@ -124,7 +194,7 @@ const controls = {
     metric: true,
     strings: {
       title: "Мое местоположение",
-      popup: function(options) {
+      popup: function (options) {
         const loc = controls.locateCtrl._marker.getLatLng();
         return `<div style="text-align: center;">Вы в радиусе ${Number(options.distance).toLocaleString()} метрах<br>от <strong>${loc.lat.toFixed(6)}</strong>, <strong>${loc.lng.toFixed(6)}</strong></div>`;
       }
@@ -133,7 +203,7 @@ const controls = {
       enableHighAccuracy: true,
       maxZoom: 18
     },
-    onLocationError: function(e) {
+    onLocationError: function (e) {
       hideLoader();
       document.querySelector(".leaflet-control-locate").getElementsByTagName("span")[0].className = "icon-gps_off";
       alert(e.message);
@@ -164,12 +234,12 @@ function loadVector(file, name, format) {
   const reader = new FileReader();
   let geojson = null;
 
-  reader.onload = function(e) {
+  reader.onload = function (e) {
     if (format == "geojson") {
       geojson = JSON.parse(reader.result);
     } else if (format == "kml") {
       const kml = (new DOMParser()).parseFromString(reader.result, "text/xml");
-      geojson = toGeoJSON.kml(kml, {styles: true});
+      geojson = toGeoJSON.kml(kml, { styles: true });
     } else if (format == "gpx") {
       const gpx = (new DOMParser()).parseFromString(reader.result, "text/xml");
       geojson = toGeoJSON.gpx(gpx);
@@ -178,9 +248,9 @@ function loadVector(file, name, format) {
       const options = {};
       if (columns.includes("Y") && columns.includes("X")) {
         options.latfield = "Y",
-        options.lonfield = "X"
+          options.lonfield = "X"
       }
-      csv2geojson.csv2geojson(reader.result, options, function(err, data) {
+      csv2geojson.csv2geojson(reader.result, options, function (err, data) {
         if (data) {
           geojson = data;
         }
@@ -194,8 +264,12 @@ function loadVector(file, name, format) {
 }
 
 defaultRoutes.forEach(item => {
-  createVectorLayer(item.routeName, item.routeData, null, false);  
+  createVectorLayer(item.routeName, item.routeData, null, false);
 })
+
+// Instantiate elevation control.
+var controlElevation = L.control.elevation(elevation_options).addTo(map);
+
 
 function createVectorLayer(name, data, key, save) {
   let radius = 4;
@@ -204,15 +278,15 @@ function createVectorLayer(name, data, key, save) {
     key: key,
     bubblingMouseEvents: false,
     style: function (feature) {
-      return {	
+      return {
         color: feature.properties.hasOwnProperty("stroke") ? feature.properties["stroke"] : feature.properties["marker-color"] ? feature.properties["marker-color"] : "#ff0000",
         opacity: feature.properties.hasOwnProperty("stroke-opacity") ? feature.properties["stroke-opacity"] : 1.0,
         weight: feature.properties.hasOwnProperty("stroke-width") ? feature.properties["stroke-width"] : 3,
         fillColor: feature.properties.hasOwnProperty("fill") ? feature.properties["fill"] : feature.properties["marker-color"] ? feature.properties["marker-color"] : "#ff0000",
         fillOpacity: feature.properties.hasOwnProperty("fill-opacity") ? feature.properties["fill-opacity"] : feature.geometry.type != "Point" ? 0.2 : feature.geometry.type == "Point" ? 1 : "",
-      };	
+      };
     },
-    pointToLayer: function (feature, latlng) {	
+    pointToLayer: function (feature, latlng) {
       const size = feature.properties.hasOwnProperty("marker-size") ? feature.properties["marker-size"] : "small";
       const sizes = {
         small: 4,
@@ -255,7 +329,7 @@ function createVectorLayer(name, data, key, save) {
                 color: "#00FFFF",
                 fillColor: "#00FFFF",
                 fillOpacity: 1
-              }); 
+              });
             }
           }))
         }
@@ -274,7 +348,7 @@ function createVectorLayer(name, data, key, save) {
       layers.overlays[L.Util.stamp(layer)] = layer;
       layer.addTo(map);
       zoomToLayer(L.Util.stamp(layer));
-    }).catch(function(err) {
+    }).catch(function (err) {
       alert("Error saving data!");
     });
   } else {
@@ -286,7 +360,7 @@ function createVectorLayer(name, data, key, save) {
 function loadRaster(file, name) {
   const reader = new FileReader();
 
-  reader.onload = function(e) {
+  reader.onload = function (e) {
     createRasterLayer(name, reader.result);
   }
 
@@ -300,7 +374,7 @@ function createRasterLayer(name, data) {
     fitBounds: true,
     updateWhenIdle: false,
     key: key
-  }).on("databaseloaded", function(e) {
+  }).on("databaseloaded", function (e) {
     name = (layer.options.name ? layer.options.name : name);
     // addOverlayLayer(layer, name);
     const value = {
@@ -309,9 +383,9 @@ function createRasterLayer(name, data) {
     };
     mapStore.setItem(key, value).then(function (value) {
       addOverlayLayer(layer, name, null, false);
-    }).catch(function(err) {
+    }).catch(function (err) {
       alert("Error saving data!");
-    }); 
+    });
 
   }).addTo(map);
   layers.overlays[L.Util.stamp(layer)] = layer;
@@ -331,11 +405,17 @@ function addOverlayLayer(layer, name, group, saved) {
   `);
   updateLayerState(layerState);
 
-  layer.on("add", function(e) {
+  layer.on("add", function (e) {
     document.querySelector(`[data-layer='${L.Util.stamp(layer)}']`).disabled = false;
+    
+    // Load track from url (allowed data types: "*.geojson", "*.gpx", "*.tcx")
+    controlElevation.clear();
+    controlElevation.load(defaultRoutes.filter(i => i.routeName === name)[0].routeData);
   });
-  layer.on("remove", function(e) {
+
+  layer.on("remove", function (e) {
     document.querySelector(`[data-layer='${L.Util.stamp(layer)}']`).disabled = true;
+    controlElevation.clear();
   });
 }
 
@@ -372,7 +452,7 @@ function zoomToLayer(id) {
     map.fitBounds(layer.options.bounds);
   }
   else {
-    map.fitBounds(layer.getBounds(), {padding: [20, 20]});
+    map.fitBounds(layer.getBounds(), { padding: [20, 20] });
   }
 }
 
@@ -384,19 +464,19 @@ function removeLayer(id, name, group) {
       map.removeLayer(layer);
     }
     if (layer instanceof L.TileLayer.MBTiles) {
-      layer._db.close(); 
+      layer._db.close();
     }
     if (layer && layer.options && layer.options.key) {
       if (layer instanceof L.TileLayer.MBTiles) {
         mapStore.removeItem(layer.options.key).then(function () {
           controls.layerCtrl.removeLayer(layer);
           updateLayerState(layerState);
-        }); 
+        });
       } else if (layer instanceof L.GeoJSON) {
         featureStore.removeItem(layer.options.key).then(function () {
           controls.layerCtrl.removeLayer(layer);
           updateLayerState(layerState);
-        }); 
+        });
       }
     }
     if (group) {
@@ -423,7 +503,7 @@ function changeOpacity(id) {
   else if (layer instanceof L.TileLayer.MBTiles) {
     layer.setOpacity(value);
   } else if (layer instanceof L.GeoJSON) {
-    layer.eachLayer(function(layer){
+    layer.eachLayer(function (layer) {
       if (layer.feature.properties["fill-opacity"] != 0) {
         layer.setStyle({
           fillOpacity: value
@@ -467,7 +547,7 @@ function switchBaseLayer(name) {
 
 function loadBasemapConfig(file) {
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = function (e) {
     const config = JSON.parse(reader.result);
     if (confirm("Are you sure you want to overwrite the default basemaps?")) {
       loadCustomBasemaps(config);
@@ -499,7 +579,7 @@ function loadCustomBasemaps(config) {
         maxNativeZoom: element.maxZoom ? element.maxZoom : 18,
         maxZoom: map.getMaxZoom(),
         attribution: element.attribution ? element.attribution : ""
-      }); 
+      });
     }
     if (index == 0) {
       layer.addTo(map);
@@ -507,7 +587,7 @@ function loadCustomBasemaps(config) {
     layers.basemaps[element.name] = layer;
     controls.layerCtrl.addBaseLayer(layer, element.name);
   });
-  layers.basemaps["Без карты"] = L.tileLayer("", {maxZoom: map.getMaxZoom()});
+  layers.basemaps["Без карты"] = L.tileLayer("", { maxZoom: map.getMaxZoom() });
   controls.layerCtrl.addBaseLayer(layers.basemaps["Без карты"], "Без карты");
 }
 
@@ -516,34 +596,34 @@ function showInfo() {
 }
 
 function loadSavedFeatures() {
-  featureStore.length().then(function(numberOfKeys) {
+  featureStore.length().then(function (numberOfKeys) {
     if (numberOfKeys > 0) {
-      featureStore.iterate(function(value, key, iterationNumber) {
+      featureStore.iterate(function (value, key, iterationNumber) {
         createVectorLayer(value.name, value.features, key, false);
-      }).then(function() {
+      }).then(function () {
         // console.log("saved features loaded!");
-      }).catch(function(err) {
+      }).catch(function (err) {
         console.log(err);
       });
     }
-  }).catch(function(err) {
+  }).catch(function (err) {
     console.log(err);
   });
 }
 
 function loadSavedMaps() {
   const urlParams = new URLSearchParams(window.location.search);
-  mapStore.length().then(function(numberOfKeys) {
+  mapStore.length().then(function (numberOfKeys) {
     if (!urlParams.has("map") && numberOfKeys != 1) {
       controls.locateCtrl.start();
     }
     if (numberOfKeys > 0) {
-      mapStore.iterate(function(value, key, iterationNumber) {
-        const group = L.layerGroup(null, {key: key});
+      mapStore.iterate(function (value, key, iterationNumber) {
+        const group = L.layerGroup(null, { key: key });
         const groupID = L.Util.stamp(group);
         layers.groups[groupID] = group;
         addOverlayLayer(group, value.name, groupID, true);
-        group.once("add", function(e) {
+        group.once("add", function (e) {
           const layer = L.tileLayer.mbTiles(value.mbtiles, {
             autoScale: true,
             fitBounds: (urlParams.has("map") && urlParams.get("map") == key) ? true : (numberOfKeys == 1) ? true : false,
@@ -558,16 +638,16 @@ function loadSavedMaps() {
           switchBaseLayer("Без карты");
           document.querySelector(`[data-layer='${groupID}']`).disabled = false;
         }
-      }).then(function() {
+      }).then(function () {
         // console.log("saved maps loaded!");
         loadSavedFeatures();
-      }).catch(function(err) {
+      }).catch(function (err) {
         console.log(err);
       });
     } else {
       loadSavedFeatures();
     }
-  }).catch(function(err) {
+  }).catch(function (err) {
     console.log(err);
   });
 }
@@ -576,11 +656,11 @@ function loadURLparams() {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has("map")) {
     const url = urlParams.get("map");
-    mapStore.keys().then(function(keys) {
+    mapStore.keys().then(function (keys) {
       if (!keys.includes(url)) {
         fetchFile(url);
       }
-    }).catch(function(err) {
+    }).catch(function (err) {
       console.log(err);
     });
     // window.history.replaceState(null, null, window.location.pathname);
@@ -598,7 +678,7 @@ function fetchFile(url) {
           autoScale: true,
           fitBounds: true,
           updateWhenIdle: false
-        }).on("databaseloaded", function(e) {
+        }).on("databaseloaded", function (e) {
           const name = layer.options.name ? layer.options.name : url.split("/").pop().split(".").slice(0, -1).join(".");
           const value = {
             "name": name,
@@ -606,11 +686,11 @@ function fetchFile(url) {
           };
           mapStore.setItem(url, value).then(function (value) {
             addOverlayLayer(layer, name);
-          }).catch(function(err) {
+          }).catch(function (err) {
             alert("Error saving data!");
-          }); 
+          });
         }).addTo(map);
-        layers.overlays[L.Util.stamp(layer)] = layer; 
+        layers.overlays[L.Util.stamp(layer)] = layer;
       })
       .catch((error) => {
         hideLoader();
@@ -676,16 +756,16 @@ document.querySelector(".leaflet-control-layers-base").addEventListener("context
   fileInput.click();
 });
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", function () {
   showLoader();
   // controls.locateCtrl.start();
 });
 
 initSqlJs({
-  locateFile: function() {
+  locateFile: function () {
     return "assets/vendor/sqljs-1.5.0/sql-wasm.wasm";
   }
-}).then(function(SQL){
+}).then(function (SQL) {
   loadURLparams();
   loadSavedMaps();
   if (localStorage.getItem("basemapConfig")) {
