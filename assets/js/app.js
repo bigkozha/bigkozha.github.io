@@ -342,7 +342,6 @@ function createVectorLayer(name, data, key, save) {
       "name": name,
       "features": data
     };
-
     featureStore.setItem(key, value).then(function (value) {
       addOverlayLayer(layer, name, null, true);
       layers.overlays[L.Util.stamp(layer)] = layer;
@@ -407,10 +406,21 @@ function addOverlayLayer(layer, name, group, saved) {
 
   layer.on("add", function (e) {
     document.querySelector(`[data-layer='${L.Util.stamp(layer)}']`).disabled = false;
-    
-    // Load track from url (allowed data types: "*.geojson", "*.gpx", "*.tcx")
     controlElevation.clear();
-    controlElevation.load(defaultRoutes.filter(i => i.routeName === name)[0].routeData);
+    
+    featureStore.getItem(layer.options.key, function (err, value) {
+      // if err is non-null, we got an error. otherwise, value is the value
+      if (value) {
+        // Load track from url (allowed data types: "*.geojson", "*.gpx", "*.tcx")
+        controlElevation.load(value.features);
+      } else {
+        const defaultMap = defaultRoutes.filter(i => i.routeName === name);
+        if (defaultMap) {
+          controlElevation.load(defaultMap[0].routeData);
+        }
+      }
+    });
+
   });
 
   layer.on("remove", function (e) {
