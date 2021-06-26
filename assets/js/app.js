@@ -78,6 +78,7 @@ const featureStore = localforage.createInstance({
   storeName: "saved_features"
 });
 
+const almatyCoordinates = [43.263800, 76.929300];
 const map = L.map("map", {
   zoomSnap: (typeof window.orientation == "undefined") ? 1 : 0,
   tap: false,
@@ -88,6 +89,7 @@ const map = L.map("map", {
     tolerance: 10
   })
 }).fitWorld();
+map.setView(almatyCoordinates, 13)
 map.attributionControl.setPrefix(`<span id="status" style="color:${navigator.onLine ? "green" : "red"}">&#9673;</span> <a href="#" onclick="showInfo(); return false;">About</a>`);
 
 map.once("locationfound", function (e) {
@@ -169,7 +171,7 @@ L.control.addfile = function (opts) {
 
 const controls = {
   layerCtrl: L.control.layers(layers.basemaps, null, {
-    collapsed: false,
+    collapsed: true,
     position: "topright",
   }).addTo(map),
 
