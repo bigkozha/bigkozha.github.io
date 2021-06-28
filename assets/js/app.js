@@ -89,7 +89,7 @@ const map = L.map("map", {
     tolerance: 10
   })
 }).fitWorld();
-map.setView(almatyCoordinates, 13)
+map.setView(almatyCoordinates, 10)
 map.attributionControl.setPrefix(`<span id="status" style="color:${navigator.onLine ? "green" : "red"}">&#9673;</span> <a href="#" onclick="showInfo(); return false;">About</a>`);
 
 map.once("locationfound", function (e) {
@@ -111,23 +111,7 @@ const layers = {
       maxNativeZoom: 18,
       maxZoom: map.getMaxZoom(),
       attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attribution">CARTO</a>',
-    }).addTo(map),
-
-    // "Aerial": L.tileLayer("https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}", {
-    //   maxNativeZoom: 16,
-    //   maxZoom: map.getMaxZoom(),
-    //   attribution: "USGS",
-    // }),
-
-    // "Topo": L.tileLayer("https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}", {
-    //   maxNativeZoom: 16,
-    //   maxZoom: map.getMaxZoom(),
-    //   attribution: "USGS",
-    // }),
-
-    "Без карты": L.tileLayer("", {
-      maxZoom: map.getMaxZoom()
-    })
+    }).addTo(map)
   },
 
   select: L.featureGroup(null).addTo(map),
@@ -170,7 +154,7 @@ L.control.addfile = function (opts) {
 /*** End custom control ***/
 
 const controls = {
-  layerCtrl: L.control.layers(layers.basemaps, null, {
+  layerCtrl: L.control.layers(null, null, {
     collapsed: true,
     position: "topright",
   }).addTo(map),
@@ -398,9 +382,9 @@ function addOverlayLayer(layer, name, group, saved) {
   controls.layerCtrl.addOverlay(layer, `
     ${name.replace(/_/g, " ")}<br>
     <span class="layer-buttons">
-      <input type="range" value="1" step="0.1" min="0" max="1" data-layer="${L.Util.stamp(layer)}" style="width: 100%;" oninput="changeOpacity(${L.Util.stamp(layer)});" ${saved ? "disabled" : ""}>
-      <a class="layer-btn" href="#" title="Zoom to layer" onclick="zoomToLayer(${L.Util.stamp(layer)}); return false;"><i class="icon-zoom_out_map" style="color: darkslategray; font-size: 22px;"></i></a>
-      <a class="layer-btn" href="#" title="Remove layer" onclick="removeLayer(${L.Util.stamp(layer)}, '${name}', '${group ? group : ''}'); return false;"><i class="icon-delete" style="color: red; font-size: 22px;"></i></a>
+    <span data-layer="${L.Util.stamp(layer)}"></span>
+      <a class="layer-btn" href="#" title="Приблизить" onclick="zoomToLayer(${L.Util.stamp(layer)}); return false;"><i class="icon-zoom_out_map" style="color: darkslategray; font-size: 22px;">&nbsp&nbsp&nbsp&nbsp</i></a>
+      <a class="layer-btn" href="#" title="Удалить" onclick="removeLayer(${L.Util.stamp(layer)}, '${name}', '${group ? group : ''}'); return false;"><i class="icon-delete" style="color: red; font-size: 22px;"></i></a>
     </span>
     <div style="clear: both;"></div>
   `);
@@ -602,6 +586,8 @@ function loadCustomBasemaps(config) {
   layers.basemaps["Без карты"] = L.tileLayer("", { maxZoom: map.getMaxZoom() });
   controls.layerCtrl.addBaseLayer(layers.basemaps["Без карты"], "Без карты");
 }
+
+console.log(L.control)
 
 function showInfo() {
   alert("Welcome to GPSMap.app, an offline capable map viewer with GPS integration!\n\n- Tap the + button to load a raster MBTiles, GeoJSON, KML, GPX, or CSV file directly from your device or cloud storage.\n- Tap the layers button to view online basemaps and manage offline layers.\n\nDeveloped by Bryan McBride - mcbride.bryan@gmail.com");
