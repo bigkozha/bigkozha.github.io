@@ -39,11 +39,7 @@
   <script src="assets/js/app.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js", { scope: '/' }).then(function (registration) {
-        console.log('Service worker registered successfully');
-      }).catch(function (e) {
-        console.error('Error during service worker registration:', e);
-      });
+      navigator.serviceWorker.register("service-worker.js", { scope: '/' });
     }
   </script>
   <noscript>This website requires JavaScript!</noscript>
