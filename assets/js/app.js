@@ -583,8 +583,8 @@ function loadCustomBasemaps(config) {
     layers.basemaps[element.name] = layer;
     controls.layerCtrl.addBaseLayer(layer, element.name);
   });
-  layers.basemaps["Без карты"] = L.tileLayer("", { maxZoom: map.getMaxZoom() });
-  controls.layerCtrl.addBaseLayer(layers.basemaps["Без карты"], "Без карты");
+  layers.basemaps["Улицы"] = L.tileLayer("", { maxZoom: map.getMaxZoom() });
+  controls.layerCtrl.addBaseLayer(layers.basemaps["Улицы"], "Улицы");
 }
 
 console.log(L.control)
@@ -633,7 +633,7 @@ function loadSavedMaps() {
         });
         if ((numberOfKeys == 1) || (urlParams.has("map") && urlParams.get("map") == key)) {
           map.addLayer(group);
-          switchBaseLayer("Без карты");
+          switchBaseLayer("Улицы");
           document.querySelector(`[data-layer='${groupID}']`).disabled = false;
         }
       }).then(function () {
@@ -705,7 +705,7 @@ function updateNetworkStatus() {
   if (navigator.onLine) {
     document.getElementById("status").style.color = "green";
   } else {
-    switchBaseLayer("Без карты");
+    switchBaseLayer("Улицы");
     document.getElementById("status").style.color = "red";
   }
 }
@@ -770,7 +770,7 @@ initSqlJs({
     loadCustomBasemaps(JSON.parse(localStorage.getItem("basemapConfig")));
   }
   if (!navigator.onLine) {
-    switchBaseLayer("Без карты");
+    switchBaseLayer("Улицы");
   } else if (localStorage.getItem("basemap")) {
     switchBaseLayer(localStorage.getItem("basemap"));
   }
