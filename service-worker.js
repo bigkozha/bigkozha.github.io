@@ -5,7 +5,7 @@ workbox.setConfig({
   modulePathPrefix: 'assets/vendor/workbox-6.1.5/'
 });
 
-const revision = '1';
+const revision = '2';
 
 workbox.precaching.precacheAndRoute([
   {url: 'index.html', revision: revision},
