@@ -393,7 +393,7 @@ function addOverlayLayer(layer, name, group, saved) {
   layer.on("add", function (e) {
     document.querySelector(`[data-layer='${L.Util.stamp(layer)}']`).disabled = false;
     controlElevation.clear();
-    
+
     featureStore.getItem(layer.options.key, function (err, value) {
       // if err is non-null, we got an error. otherwise, value is the value
       if (value) {
@@ -586,8 +586,6 @@ function loadCustomBasemaps(config) {
   layers.basemaps["Улицы"] = L.tileLayer("", { maxZoom: map.getMaxZoom() });
   controls.layerCtrl.addBaseLayer(layers.basemaps["Улицы"], "Улицы");
 }
-
-console.log(L.control)
 
 function showInfo() {
   alert("Welcome to GPSMap.app, an offline capable map viewer with GPS integration!\n\n- Tap the + button to load a raster MBTiles, GeoJSON, KML, GPX, or CSV file directly from your device or cloud storage.\n- Tap the layers button to view online basemaps and manage offline layers.\n\nDeveloped by Bryan McBride - mcbride.bryan@gmail.com");
