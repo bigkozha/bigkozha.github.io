@@ -442,7 +442,7 @@ function zoomToLayer(id) {
   const layer = layers.overlays[id];
   if (!map.hasLayer(layer)) {
     // map.addLayer(layers.overlays[id]);
-    alert("Layer must be active first!");
+    alert("Карта должна быть выбрана!");
   }
   else if (layer.options.bounds) {
     map.fitBounds(layer.options.bounds);
@@ -453,7 +453,7 @@ function zoomToLayer(id) {
 }
 
 function removeLayer(id, name, group) {
-  if (confirm(`Remove ${name.replace(/_/g, " ")}?`)) {
+  if (confirm(`Удалить ${name.replace(/_/g, " ")}?`)) {
     const layerState = getLayerState();
     const layer = layers.overlays[id];
     if (map.hasLayer(layer)) {
