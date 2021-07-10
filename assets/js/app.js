@@ -89,7 +89,7 @@ const map = L.map("map", {
     tolerance: 10
   })
 }).fitWorld();
-map.setView(almatyCoordinates, 10)
+map.setView(almatyCoordinates, 6)
 map.attributionControl.setPrefix(`<span id="status" style="color:${navigator.onLine ? "green" : "red"}">&#9673;</span> <a href="#" onclick="showInfo(); return false;">About</a>`);
 
 map.once("locationfound", function (e) {
@@ -393,16 +393,20 @@ function addOverlayLayer(layer, name, group, saved) {
   layer.on("add", function (e) {
     document.querySelector(`[data-layer='${L.Util.stamp(layer)}']`).disabled = false;
     controlElevation.clear();
-
     featureStore.getItem(layer.options.key, function (err, value) {
       // if err is non-null, we got an error. otherwise, value is the value
       if (value) {
         // Load track from url (allowed data types: "*.geojson", "*.gpx", "*.tcx")
         controlElevation.load(value.features);
+        console.log(value.features)
       } else {
         const defaultMap = defaultRoutes.filter(i => i.routeName === name);
         if (defaultMap) {
           controlElevation.load(defaultMap[0].routeData);
+          console.log(defaultMap[0].routeData.features[0].geometry.coordinates[0])
+          const markerCoord = defaultMap[0].routeData.features[0].geometry.coordinates[0];
+          L.marker([markerCoord[1], markerCoord[0]]).addTo(map).bindPopup("Начало маршрута");
+          
         }
       }
     });
@@ -486,31 +490,6 @@ function removeLayer(id, name, group) {
       controls.layerCtrl.removeLayer(layer);
       updateLayerState(layerState);
     }
-  }
-}
-
-function changeOpacity(id) {
-  const value = document.querySelector(`[data-layer='${id}']`).value;
-  const layer = layers.overlays[id];
-  if (!map.hasLayer(layer)) {
-    // map.addLayer(layers.overlays[id]);
-    alert("Layer must be active first!");
-  }
-  else if (layer instanceof L.TileLayer.MBTiles) {
-    layer.setOpacity(value);
-  } else if (layer instanceof L.GeoJSON) {
-    layer.eachLayer(function (layer) {
-      if (layer.feature.properties["fill-opacity"] != 0) {
-        layer.setStyle({
-          fillOpacity: value
-        });
-      }
-      if (layer.feature.properties["opacity"] != 0) {
-        layer.setStyle({
-          opacity: value
-        });
-      }
-    });
   }
 }
 
