@@ -1,0 +1,70 @@
+// import { ThunkAction, ThunkDispatch } from "redux-thunk";
+// import { AnyAction } from "redux";
+// import {
+//   DirectoratesClient,
+//   DirectorateDto,
+// } from "../../../services/tApiClient";
+
+// interface SetAction {
+//   type: "SET";
+//   directorates: DirectorateDto[];
+// }
+// interface SetFetcing {
+//   type: "SET_FETCHING";
+//   isFetching: boolean;
+// }
+
+// type ListActions = SetAction | SetFetcing;
+
+// const set = (directorates: DirectorateDto[]): SetAction => {
+//   return { type: "SET", directorates };
+// };
+
+// const isFetching = (isFetching: boolean): SetFetcing => {
+//   return { type: "SET_FETCHING", isFetching };
+// };
+
+// // thunk action
+// export const loadDirectorates = (): ThunkAction<
+//   Promise<void>,
+//   {},
+//   {},
+//   AnyAction
+// > => {
+//   return async (dispatch: ThunkDispatch<{}, {}, AnyAction>): Promise<void> => {
+//     const client = new DirectoratesClient();
+
+//     dispatch(isFetching(true));
+
+//     try {
+//       const result = await client.getDirectorates();
+//       dispatch(set(result));
+//     } catch (error) {
+//       console.error(error);
+//     }
+
+//     dispatch(isFetching(false));
+//   };
+// };
+
+// // States' definition
+// export interface DirectorateState {
+//   isFetching: boolean;
+//   directorates: DirectorateDto[];
+// }
+
+// const directoratesReducer = (
+//   state: DirectorateState = { isFetching: false, directorates: [] },
+//   action: ListActions
+// ): DirectorateState => {
+//   switch (action.type) {
+//     case "SET":
+//       return { ...state, directorates: action.directorates };
+//     case "SET_FETCHING":
+//       return { ...state, isFetching: action.isFetching };
+
+//     default:
+//       return state;
+//   }
+// };
+// export default directoratesReducer;

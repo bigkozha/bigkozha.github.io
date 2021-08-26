@@ -1,0 +1,61 @@
+.moaLogo {
+  text-align: center;
+  padding: 2.4em 0;
+}
+
+.moaLogo img {
+  width: 100%;
+}
+
+.wrapper.ant-layout {
+  padding: 24px;
+  background-color: #fff;
+}
+
+.mainHeader {
+  height: 41px;
+  background: #363d47;
+  padding: 0;
+}
+
+.mainHeader .avatarCircle {
+  margin-right: 10px;
+  display: inline-block;
+  margin-top: -2px;
+}
+
+.mainHeader h4 {
+  margin: 0.4em 0;
+  color: #fff;
+  font-size: 15px;
+}
+
+.mainHeader h4.roleInfo {
+  margin: 0.3em 0;
+}
+
+.moaDescription h4 {
+  margin-bottom: 0;
+}
+
+.wrapper .login h5 {
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+.moaDescription p {
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+.moaDescription span {
+  font-size: 13px;
+}
+
+.login {
+  line-height: 47px;
+}
+
+.spinWrapperDiv .ant-spin-text {
+  font-size: 25px;
+}
